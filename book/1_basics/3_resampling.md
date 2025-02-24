@@ -18,3 +18,4 @@ myst:
 # <i class="fa-solid fa-dice"></i> Resampling Strategies
 
 hello world
+test
