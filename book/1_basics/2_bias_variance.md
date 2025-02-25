@@ -59,5 +59,5 @@ To achieve the best possible training MSE, we need to **minimize** both bias and
 ```{code-cell} ipython3
 :tags: [remove-input]
 from jupyterquiz import display_quiz
-display_quiz('Quiz_BiasVar.json')
+display_quiz('Quiz/Quiz_BiasVar.json')
 ```
