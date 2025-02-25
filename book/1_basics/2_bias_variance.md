@@ -46,7 +46,7 @@ account, you are essentially trading off between bias and variance:
   <!-- Rechte Spalte: Figure -->
   <div style="flex: 0 0 auto; margin-left: 20px; text-align: right;">
     <figure>
-      <img src="book/1_basics/figures/Bias_Variance.png" alt="Bias-Variance Trade Off" width="200">
+      <img src="C:/Users/Conni_B/Documents/GitHub/psy112\book/1_basics/figures/Bias_Variance.png" alt="Bias-Variance Trade Off" width="200">
       <figcaption>red - MSE, blue - Bias, yellow - Variance</figcaption>
     </figure>
   </div>
