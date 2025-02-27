@@ -32,9 +32,6 @@ Resampling methods involve:
 2. fit the model to all resulting subsets and predict a held out amount of data
 3. Examine all of the refitted models and draw appropriate conclusions
 ```
-```{margin}
-Hyperparameter are paramateres that are not learned from the data but set by the scientist before the training process begin. T
-```
 
 ## Cross-Validation
 ### *Todays data - Iris dataset*
@@ -66,6 +63,11 @@ display_quiz('Quiz/Quiz_Iris.json')
 ```
 
 ### Validation Set approach
+
+```{margin}
+Hyperparameter are paramateres that are not learned from the data but set by the scientist before the training process begin. T
+```
+
 In the simplest approach of cross-validation the dataset is **randomly split into two independent subsets**:
 - *Training Set*: Used to train the model by learning patterns and relationships in the data
 - *Validation Set*: Used to assess model performance across different models and hyperparameter choices. It therefore provides an estimation of the test error.
@@ -109,7 +111,8 @@ Lets try this with our Iris dataset.
 1.  As a first step, we need to **define the Target(y) and Features(X)**.
 
 ```{code-cell}
-# thanks to Scikit-Learn, the Iris dataset is already predefined and consists of # defined Features and Target, which we now can use 
+# thanks to Scikit-Learn, the Iris dataset is already predefined and consists of 
+# defined Features and Target, which we now can use 
 X, y = datasets.load_iris(return_X_y=True) 
 ```
 2. **Split** the data into training and test sample
@@ -121,8 +124,27 @@ from sklearn.model_selection import train_test_split
 X_train, X_test, y_train, y_test= train_test_split(X,y, test_size=0.4, random_state=0)
 ```
 
-<iframe src="https://trinket.io/embed/python3/5c557f80cf27?runMode=console" width="100%" height="356" frameborder="0" marginwidth="0" marginheight="0" allowfullscreen></iframe>
-
+<iframe src="https://trinket.io/embed/python3/39cc2749b878" width="100%" height="356" frameborder="0" marginwidth="0" marginheight="0" allowfullscreen></iframe>
 
 
 3. **Fit** the model
+As we predict quantitaive outcome, we need a classification model. The model learns a decision boundary to separate classes in the feature space.
+
+```{margin}
+A high C will try to classify all training points correctly and leads to a complex decision boundary.
+```
+
+```{code-cell}
+from sklearn import svm
+
+# Using a support vector machine classifier with the training data
+# C as hyperparameter/REgularization parameter
+clf = svm.SVC(kernel='linear', C=1).fit(X_train, y_train)
+```
+
+4. **Evaluate** model performance
+```{code-cell}
+clf.score(X_test, y_test)
+
+```
+In case of a classification problem, we are looking at accuracy. An accuracy of ~97% means our model predicts approximately 97 out of 100 datapoints correctly.
