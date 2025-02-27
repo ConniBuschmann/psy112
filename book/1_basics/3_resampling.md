@@ -122,10 +122,8 @@ X_train, X_test, y_train, y_test= train_test_split(X,y, test_size=0.4, random_st
 
 ```
 
-
-
 ```{code-cell} ipython3
 :tags: [remove-input]
-<iframe src="https://trinket.io/python3/2231267f9f94" width="100%" height="600" frameborder="0" marginwidth="0" marginheight="0" allowfullscreen></iframe>```
-
+<iframe src="https://trinket.io/python3/2231267f9f94" width="100%" height="600" frameborder="0" marginwidth="0" marginheight="0" allowfullscreen></iframe>
 ```
+3. **Fit** the model
