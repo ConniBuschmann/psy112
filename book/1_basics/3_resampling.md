@@ -32,13 +32,47 @@ Resampling methods involve:
 2. fit the model to all resulting subsets and predict a held out amount of data
 3. Examine all of the refitted models and draw appropriate conclusions
 ```
+```{margin}
+Hyperparameter are paramateres that are not learned from the data but set by the scientist before the training process begin. T
+```
 
 ## Cross-Validation
 ### Validation Set approach
 In the simplest approach of cross-validation the dataset is **randomly split into two independent subsets**:
 - *Training Set*: Used to train the model by learning patterns and relationships in the data
-- *Validation Set*: Used to assess model performance across different models and hyperparameter choices 
+- *Validation Set*: Used to assess model performance across different models and hyperparameter choices. It therefore provides an estimation of the test error.
 
-```{margin}
-Hyperparameter are paramateres that are not learned from the data but set by the scientist before the training process begin. They are essential for fine-tuning models to achieve optimal performance
+```{code-cell} ipython3
+:tags: [remove-input]
+## creating a nice looking figure to visualize the spliiting in validation set approach
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+
+# Create figure and axis
+fig, ax = plt.subplots(figsize=(8, 3))
+ax.set_xlim(0, 10)
+ax.set_ylim(0, 6)
+ax.axis("off")
+
+# Whole dataset
+ax.add_patch(patches.Rectangle((1, 4), 8, 1, color='gray', alpha=0.6))
+ax.text(5, 4.5, "Whole Data Set", ha='center', va='center', fontsize=12, color='black')
+
+# Validation set
+ax.add_patch(patches.Rectangle((1, 2), 4, 1, color='lightcoral', alpha=0.6))
+ax.text(3, 2.5, "Validation Set", ha='center', va='center', fontsize=12, color='black')
+
+# Training set
+ax.add_patch(patches.Rectangle((5, 2), 4, 1, color='lightblue', alpha=0.6))
+ax.text(7, 2.5, "Training Set", ha='center', va='center', fontsize=12, color='black')
+
+# Arrow from Whole Data Set to Training/Validation Set
+ax.annotate('', xy=(3, 4), xytext=(3, 3), arrowprops=dict(arrowstyle='->', color='black'))
+ax.annotate('', xy=(7, 4), xytext=(7, 3), arrowprops=dict(arrowstyle='->', color='black'))
+
+# Title
+ax.text(5, 5.5, "Validation Set Approach", ha='center', va='center', fontsize=14, fontweight='bold')
+
+plt.show()
 ```
+
