@@ -109,7 +109,7 @@ Lets try this with our Iris dataset.
 1.  As a first step, we need to **define the Target(y) and Features(X)**.
 
 ```{code-cell}
-# thanks to Scikit-Learn, the Iris dataset is already predefined and consists of defined Features and Target, which we now can use 
+# thanks to Scikit-Learn, the Iris dataset is already predefined and consists of # defined Features and Target, which we now can use 
 X, y = datasets.load_iris(return_X_y=True) 
 ```
 2. **Split** the data into training and test sample
@@ -121,9 +121,6 @@ from sklearn.model_selection import train_test_split
 X_train, X_test, y_train, y_test= train_test_split(X,y, test_size=0.4, random_state=0)
 
 ```
+<iframe src="https://trinket.io/embed/python3/09d06157a6" width="100%" height="600" frameborder="0" marginwidth="0" marginheight="0" allowfullscreen></iframe>
 
-```{code-cell} ipython3
-:tags: [remove-input]
-<iframe src="https://trinket.io/python3/2231267f9f94" width="100%" height="600" frameborder="0" marginwidth="0" marginheight="0" allowfullscreen></iframe>
-```
 3. **Fit** the model
