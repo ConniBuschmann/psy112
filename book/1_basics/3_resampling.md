@@ -37,6 +37,34 @@ Hyperparameter are paramateres that are not learned from the data but set by the
 ```
 
 ## Cross-Validation
+### *Todays data - Iris dataset*
+Let's look at how to apply the validation set approach using data.
+The data set consists of 50 samples from each of three species of Iris (Iris setosa, Iris virginica and Iris versicolor). Four features were measured from each sample: the length and the width of the sepals and petals, in centimeters.
+
+```{code-cell} 
+# import packages
+from sklearn import datasets
+import matplotlib.pyplot as plt
+
+# load dataset
+iris= datasets.load_iris()
+
+# Lets visualize two of our features to get an impression of the data
+fig, ax = plt.subplots()
+scatter = ax.scatter(iris.data[:, 0], iris.data[:, 1], c=iris.target)
+ax.set(xlabel=iris.feature_names[0], ylabel=iris.feature_names[1])
+fig= ax.legend(
+    scatter.legend_elements()[0], iris.target_names, loc="lower right", title="Classes"
+)
+```
+The goal of the algorithm is to classify the flowers based on our features. As we only have 150 datapoints for this prediction, we can use resampling methods to avoid overfitting and get a more stable result.
+
+```{code-cell} ipython3
+:tags: [remove-input]
+from jupyterquiz import display_quiz
+display_quiz('Quiz/Quiz_Iris.json')
+```
+
 ### Validation Set approach
 In the simplest approach of cross-validation the dataset is **randomly split into two independent subsets**:
 - *Training Set*: Used to train the model by learning patterns and relationships in the data
@@ -76,29 +104,28 @@ ax.text(5, 5.5, "Validation Set Approach", ha='center', va='center', fontsize=14
 
 plt.show()
 ```
-### *Todays data - Iris dataset*
-Let's look at how to apply the validation set approach using data.
-The data set consists of 50 samples from each of three species of Iris (Iris setosa, Iris virginica and Iris versicolor). Four features were measured from each sample: the length and the width of the sepals and petals, in centimeters.
+Lets try this with our Iris dataset.
 
-```{code-cell} 
-# import packages
-from sklearn import datasets
-import matplotlib.pyplot as plt
+1.  As a first step, we need to **define the Target(y) and Features(X)**.
 
-# load dataset
-iris= datasets.load_iris()
-
-# Lets visualize two of our features to get an impression of the data
-fig, ax = plt.subplots()
-scatter = ax.scatter(iris.data[:, 0], iris.data[:, 1], c=iris.target)
-ax.set(xlabel=iris.feature_names[0], ylabel=iris.feature_names[1])
-fig= ax.legend(
-    scatter.legend_elements()[0], iris.target_names, loc="lower right", title="Classes"
-)
+```{code-cell}
+# thanks to Scikit-Learn, the Iris dataset is already predefined and consists of defined Features and Target, which we now can use 
+X, y = datasets.load_iris(return_X_y=True) 
 ```
+2. **Split** the data into training and test sample
+
+```{code-cell}
+from sklearn.model_selection import train_test_split
+
+# sample  a training set while holding out 40% of the data for testing the classifier
+X_train, X_test, y_train, y_test= train_test_split(X,y, test_size=0.4, random_state=0)
+
+```
+
+
 
 ```{code-cell} ipython3
 :tags: [remove-input]
-from jupyterquiz import display_quiz
-display_quiz('Quiz/Quiz_Iris.json')
+<iframe src="https://trinket.io/embed/python3/09d06157a6" width="100%" height="600" frameborder="0" marginwidth="0" marginheight="0" allowfullscreen></iframe>```
+
 ```
