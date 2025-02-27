@@ -69,10 +69,36 @@ ax.text(7, 2.5, "Training Set", ha='center', va='center', fontsize=12, color='bl
 # Arrow from Whole Data Set to Training/Validation Set
 ax.annotate('', xy=(3, 4), xytext=(3, 3), arrowprops=dict(arrowstyle='->', color='black'))
 ax.annotate('', xy=(7, 4), xytext=(7, 3), arrowprops=dict(arrowstyle='->', color='black'))
+# to Micha: Arrows even needed??
 
 # Title
 ax.text(5, 5.5, "Validation Set Approach", ha='center', va='center', fontsize=14, fontweight='bold')
 
 plt.show()
 ```
+### *Todays data - Iris dataset*
+Let's look at how to apply the validation set approach using data.
+The data set consists of 50 samples from each of three species of Iris (Iris setosa, Iris virginica and Iris versicolor). Four features were measured from each sample: the length and the width of the sepals and petals, in centimeters.
 
+```{code-cell} 
+# import packages
+from sklearn import datasets
+import matplotlib.pyplot as plt
+
+# load dataset
+iris= datasets.load_iris()
+
+# Lets visualize two of our features to get an impression of the data
+fig, ax = plt.subplots()
+scatter = ax.scatter(iris.data[:, 0], iris.data[:, 1], c=iris.target)
+ax.set(xlabel=iris.feature_names[0], ylabel=iris.feature_names[1])
+fig= ax.legend(
+    scatter.legend_elements()[0], iris.target_names, loc="lower right", title="Classes"
+)
+```
+
+```{code-cell} ipython3
+:tags: [remove-input]
+from jupyterquiz import display_quiz
+display_quiz('Quiz/Quiz_Iris.json')
+```
