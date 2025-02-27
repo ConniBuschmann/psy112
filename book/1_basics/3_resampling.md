@@ -121,9 +121,8 @@ from sklearn.model_selection import train_test_split
 X_train, X_test, y_train, y_test= train_test_split(X,y, test_size=0.4, random_state=0)
 ```
 
-```{code-cell}
-from IPython.display import IFrame
-IFrame('https://trinket.io/python3/2231267f9f94', 700, 500)
-```
+<iframe src="https://trinket.io/embed/python3/5c557f80cf27?runMode=console" width="100%" height="356" frameborder="0" marginwidth="0" marginheight="0" allowfullscreen></iframe>
+
+
 
 3. **Fit** the model
