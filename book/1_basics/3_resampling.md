@@ -138,7 +138,7 @@ A high C will try to classify all training points correctly and leads to a compl
 from sklearn import svm
 
 # Using a support vector machine classifier with the training data
-# C as hyperparameter/REgularization parameter
+# C as hyperparameter/Regularization parameter
 clf = svm.SVC(kernel='linear', C=1).fit(X_train, y_train)
 ```
 
@@ -148,3 +148,11 @@ clf.score(X_test, y_test)
 
 ```
 In the case of classification, we evaluate model performance using accuracy. An accuracy of ~97% means that, on average, the model correctly predicts 97 out of 100 test samples.
+
+
+```{code-cell} ipython3
+:tags: [remove-input]
+
+from jupytercards import display_flashcards
+display_flashcards('quiz/Flashcard_ValidationSet.json')
+```
