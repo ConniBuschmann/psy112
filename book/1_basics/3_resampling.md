@@ -147,4 +147,4 @@ clf = svm.SVC(kernel='linear', C=1).fit(X_train, y_train)
 clf.score(X_test, y_test)
 
 ```
-In case of a classification problem, we are looking at accuracy. An accuracy of ~97% means our model predicts approximately 97 out of 100 datapoints correctly.
+In the case of classification, we evaluate model performance using accuracy. An accuracy of ~97% means that, on average, the model correctly predicts 97 out of 100 test samples.
