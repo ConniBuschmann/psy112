@@ -154,8 +154,9 @@ In the case of classification, we evaluate model performance using accuracy. An 
 :tags: [remove-input]
 
 from jupytercards import display_flashcards
-display_flashcards('Quiz/Flashcard_ValidationSet.json')
+display_flashcards('book/1_basics/Quiz/Flashcard_ValidationSet.json')
 ```
+
 ```{admonition} Summary
 :class: hint
 
@@ -217,7 +218,6 @@ ax.add_patch(patches.Rectangle((9, 6), 2, 1, facecolor='lightcoral',  alpha=0.6)
 
 # Arrow from Whole Data Set to Training/Validation Set
 ax.annotate('', xy=(6, 7), xytext=(6, 8), arrowprops=dict(arrowstyle='<-', color='black'))
-
 
 plt.show()
 # probably not the most efficient way! Maybe putting it in a loop? 
