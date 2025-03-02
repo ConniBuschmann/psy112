@@ -154,5 +154,144 @@ In the case of classification, we evaluate model performance using accuracy. An 
 :tags: [remove-input]
 
 from jupytercards import display_flashcards
-display_flashcards('quiz/Flashcard_ValidationSet.json')
+display_flashcards('Quiz/Flashcard_ValidationSet.json')
 ```
+```{admonition} Summary
+:class: hint
+
+While the Validation Set Approach is a quick and easy way to check how well a model performs, it has a major flaw: it puts all its trust in a **single data split**. Imagine training a model, evaluating it once, and calling it a day — what if that split was just lucky (or unlucky)? A bad split can doom a great model, while a lucky one might trick us into thinking a weak model is stronger than it is.
+```
+
+### k-fold Cross Validation
+To get a more reliable and robust performance estimate, we need something smarter— something that doesn’t leave our results up to chance. Rather than worrying about which split of data to use for training versus validation, we'll use them all in turn.
+
+In k-fold cross validation we randomly dive the dataset into k equal-sized folds. One fold is designated at the validation set, while the remaining **k-1** samples are the training sets. The fitting process is repeated **k-times**, each time using a different fold as the validation set. At the end of the process, we compute the **average** score across all validation sets to obtain a more reliable estimate of the model's overall performance.
+
+
+```{code-cell} ipython3
+:tags: [remove-input]
+
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+# documentation:
+# https://matplotlib.org/stable/api/_as_gen/matplotlib.patches.Rectangle.html
+
+
+# defining k 
+k=5
+
+# Create figure and axis
+fig, ax = plt.subplots(figsize=(8, 3))
+ax.set_xlim(0, 13)
+ax.set_ylim(0, k+4)
+ax.axis("off")
+
+# Whole dataset
+ax.add_patch(patches.Rectangle((1, 8), 10, 1, color='gray', alpha=0.6))
+ax.text(6, 8.5, "Whole Data Set", ha='center', va='center', fontsize=12, color='black')
+
+# k=1 
+# Rectangle(xy, width, height...)
+ax.add_patch(patches.Rectangle((1, 2), 2, 1, color='lightcoral', alpha=0.6))        # Valdiation set
+ax.add_patch(patches.Rectangle((3, 2), 8, 1, color='lightblue', alpha=0.6))         # Training set 
+
+# k=2 
+ax.add_patch(patches.Rectangle((1, 3), 2, 1, facecolor='lightblue',  alpha=0.6))  # First training part
+ax.add_patch(patches.Rectangle((3, 3), 2, 1, facecolor='lightcoral',  alpha=0.6))  # Validation part
+ax.add_patch(patches.Rectangle((5, 3), 6, 1, facecolor='lightblue', alpha=0.6))   # Remaining training part
+
+# k=3
+ax.add_patch(patches.Rectangle((1, 4), 4, 1, facecolor='lightblue',  alpha=0.6)) 
+ax.add_patch(patches.Rectangle((5, 4), 2, 1, facecolor='lightcoral',  alpha=0.6))   
+ax.add_patch(patches.Rectangle((7, 4), 4, 1, facecolor='lightblue', alpha=0.6))  
+
+# k=4
+ax.add_patch(patches.Rectangle((1, 5), 6, 1, facecolor='lightblue',  alpha=0.6)) 
+ax.add_patch(patches.Rectangle((7, 5), 2, 1, facecolor='lightcoral',  alpha=0.6))   
+ax.add_patch(patches.Rectangle((9, 5), 2, 1, facecolor='lightblue', alpha=0.6))  
+
+# k=5
+ax.add_patch(patches.Rectangle((1, 6), 8, 1, facecolor='lightblue',  alpha=0.6)) 
+ax.add_patch(patches.Rectangle((9, 6), 2, 1, facecolor='lightcoral',  alpha=0.6))   
+
+
+# Arrow from Whole Data Set to Training/Validation Set
+ax.annotate('', xy=(6, 7), xytext=(6, 8), arrowprops=dict(arrowstyle='<-', color='black'))
+
+
+plt.show()
+# probably not the most efficient way! Maybe putting it in a loop? 
+```
+
+Let`s also try this method on our dataset. 
+
+
+1. Defining Target and Features
+```{code-cell}
+X, y = datasets.load_iris(return_X_y=True) 
+```
+
+
+```{margin}
+k is also a hyperparameter!
+```
+2. Choosing *k*
+```{code-cell}
+from sklearn.model_selection import KFold
+# Lets just start with k=5
+k_fold = KFold(n_splits = 5)
+```
+
+3. Choosing and creating a model 
+
+
+TO MICHA: Here, we could also use a DecisionTreeClassifier since it is computationally cheaper, making it more suitable for multiple repetitions, as required in K-Fold. Also for SVM we need to loop through each iteration to get the training data set as an input parameter from SVM. However, introducing two classifiers might be quite confusing for them! Especially if the exercise will then ask for regression models 
+
+If we choose **Decision Tree**:
+While we've previously used Support Vector Machines (SVMs), we might also consider a Decision Tree Classifier for K-Fold Cross-Validation. Decision Trees are computationally cheaper, making them more efficient for multiple training iterations, as required in K-Fold. 
+
+```{code-cell}
+from sklearn.tree import DecisionTreeClassifier
+
+clf = DecisionTreeClassifier(random_state=42) 
+```
+
+4. Evaluate the model
+```{code-cell}
+scores = cross_val_score(clf, X, y, cv = k_folds) 
+
+# print the score for each iteration and the average score over all folds
+print("Cross Validation Scores: ", scores)
+print("Average CV Score: ", scores.mean())
+```
+
+3. Choosing, creating and evaluation the model
+If we choose **SVM**
+As introduced in the Validation Set Approach, we can once again use a Support Vector Machine (SVM) Classifier. However, unlike the Validation Set Approach, where we have a single fixed training split, the K-Fold method dynamically changes the training and validation sets in each iteration.
+
+```{code-cell}
+from sklearn import svm
+# Initialize model
+clf = svm.SVC(kernel='linear', C=1)
+
+# Iterate over each fold and dynamically define the training set 
+for train_index, val_index in k_fold.split(X):
+    X_train, X_val = X[train_index], X[val_index]
+    y_train, y_val = y[train_index], y[val_index]
+
+    # Train model on current fold
+    clf.fit(X_train, y_train)
+
+    # Evaluate on validation set
+    score = clf.score(X_val, y_val)
+    print(f" Validation Score for k={k_fold.split} : {score}")
+```
+
+
+
+#### Choosing the best k
+Spielregler um zu sehen, dass je größer k desto kleiner die samples
+Is k Tuned Like Other Hyperparameters?
+
+    Unlike parameters like learning rate or number of layers, k is not optimized in the same way (e.g., grid search).
+    Instead, it's typically chosen heuristically based on dataset size and computational feasibility.
