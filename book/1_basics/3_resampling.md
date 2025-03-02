@@ -33,7 +33,7 @@ Resampling methods involve:
 3. Examine all of the refitted models and draw appropriate conclusions
 ```
 
-## Cross-Validation
+## **Cross-Validation**
 ### *Todays data - Iris dataset*
 Let's look at how to apply the validation set approach using data.
 The data set consists of 50 samples from each of three species of Iris (Iris setosa, Iris virginica and Iris versicolor). Four features were measured from each sample: the length and the width of the sepals and petals, in centimeters.
@@ -123,7 +123,8 @@ from sklearn.model_selection import train_test_split
 # sample  a training set while holding out 40% of the data for testing the classifier
 X_train, X_test, y_train, y_test= train_test_split(X,y, test_size=0.4, random_state=0)
 ```
-
+**Hands on**: 
+Please split the data into training and test sample. The test sample should contain 73% of the data.
 <iframe src="https://trinket.io/embed/python3/39cc2749b878" width="100%" height="356" frameborder="0" marginwidth="0" marginheight="0" allowfullscreen></iframe>
 
 
@@ -154,7 +155,8 @@ In the case of classification, we evaluate model performance using accuracy. An 
 :tags: [remove-input]
 
 from jupytercards import display_flashcards
-display_flashcards('book/1_basics/Quiz/Flashcard_ValidationSet.json')
+display_flashcards('Quiz/Flashcard_ValidationSet.json')
+
 ```
 
 ```{admonition} Summary
@@ -231,10 +233,10 @@ Let`s also try this method on our dataset.
 X, y = datasets.load_iris(return_X_y=True) 
 ```
 
-
 ```{margin}
 k is also a hyperparameter!
 ```
+
 2. Choosing *k*
 ```{code-cell}
 from sklearn.model_selection import KFold
@@ -266,6 +268,7 @@ scores = cross_val_score(clf, X, y, cv = k_fold)
 print("Cross Validation Scores: ", scores)
 print("Average CV Score: ", scores.mean())
 ```
+The averaged model accuracy is about 91%. 
 
 3. Choosing, creating and evaluation the model
 
@@ -275,8 +278,12 @@ As introduced in the Validation Set Approach, we can once again use a Support Ve
 
 ```{code-cell}
 from sklearn import svm
+
 # Initialize model
 clf = svm.SVC(kernel='linear', C=1)
+
+# list to store the scores
+scores=[]
 
 # Iterate over each fold and dynamically define the training set 
 for train_index, val_index in k_fold.split(X):
@@ -288,18 +295,71 @@ for train_index, val_index in k_fold.split(X):
 
     # Evaluate on validation set
     score = clf.score(X_val, y_val)
-    print(f" Validation Score for k={k_fold.split} : {score}")
+    scores.append(score)                     # Append score to list
+    print(f"Validation Score : {score}")
+
+# print average CV score
+print("Average CV Score: ", sum(scores) / len(scores))
+```
+The averaged model accuracy is about 95%. 
+
+```{admonition} Validation Set vs. k-fold Cross Validationach approach
+:class: note
+
+Comparing these 2 Cross Validation approaches, it can be observed that the validation set approach seems to show a better accuracy. But does this reflects the reality?
+- The Validation Set Approach often **overestimates** accuracy since it tests the model on a single split, leading to potential overfitting. 
+- In contrast, K-Fold Cross-Validation provides a **more reliable** assessment by evaluating multiple splits, reducing bias, and offering a realistic performance estimate. 
+- If K-Fold accuracy is significantly lower, it indicates that the initial estimate was overly optimistic. 
+
+Therefore, K-Fold is preferred as it provides a more trustworthy measure of real-world performance.
+```
+
+**Hands on**:
+Please change k. 
+
+<iframe src="https://trinket.io/embed/python3/29cdfb10f7f9" width="100%" height="356" frameborder="0" marginwidth="0" marginheight="0" allowfullscreen></iframe>
+
+
+```{admonition} The choice of k
+:class: note 
+
+The parameter k, which represents the number of folds in Cross-Validation (CV), is a hyperparameter. Choosing an appropriate k involves a trade-off between bias, variance, and computational cost
+A higher k generally provides a more stable and reliable estimate but comes with higher computational effort. However, a lower k may result in higher variance, meaning the performance estimation could be less stable.
+
+Generally speaking, k = 5 or k = 10 is most common, as it balances computation time and reliability.
 ```
 
 
+```{margin}
+In LOOCV k=n!
+```
 
-MODEL SUMMARY
+### Leave-one-out Cross Validation (LOOCV)
+LOOCV is a special case of K-Fold Cross-Validation, where k equals the number of observations. In LOOCV, the model is trained on all but one data point, and the remaining single observation is used for validation. This process repeats for each data point, ensuring every observation is used for testing exactly once. 
 
+While LOOCV provides a low-bias estimate, it is computationally expensive and may lead to high variance in model performance. 
 
+In Python, the Leave One Out approach is very similiar to the k-fold procedure. Only the Cross validation method is changed to `LeaveOneOut()`. 
+```{code-cell}
+# import packages
+from sklearn import datasets
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import LeaveOneOut, cross_val_score
 
-#### Choosing the best k
-Spielregler um zu sehen, dass je größer k desto kleiner die samples
-Is k Tuned Like Other Hyperparameters?
+# define target and features
+X, y = datasets.load_iris(return_X_y=True)
 
-Unlike parameters like learning rate or number of layers, k is not optimized in the same way (e.g., grid search).
-Instead, it's typically chosen heuristically based on dataset size and computational feasibility.
+# define classifier model
+clf = DecisionTreeClassifier(random_state=42)
+
+# define Cross Validatin approach
+loo= LeaveOneOut()
+
+# fit model
+scores = cross_val_score(clf, X, y, cv = loo)
+
+# Print scores
+print("Average CV Score: ", scores.mean())
+```
+
+## **Bootstrapping**
