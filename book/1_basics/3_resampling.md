@@ -258,7 +258,9 @@ clf = DecisionTreeClassifier(random_state=42)
 
 4. Evaluate the model
 ```{code-cell}
-scores = cross_val_score(clf, X, y, cv = k_folds) 
+from sklearn.model_selection import cross_val_score
+
+scores = cross_val_score(clf, X, y, cv = k_fold) 
 
 # print the score for each iteration and the average score over all folds
 print("Cross Validation Scores: ", scores)
@@ -266,6 +268,8 @@ print("Average CV Score: ", scores.mean())
 ```
 
 3. Choosing, creating and evaluation the model
+
+
 If we choose **SVM**
 As introduced in the Validation Set Approach, we can once again use a Support Vector Machine (SVM) Classifier. However, unlike the Validation Set Approach, where we have a single fixed training split, the K-Fold method dynamically changes the training and validation sets in each iteration.
 
@@ -289,9 +293,13 @@ for train_index, val_index in k_fold.split(X):
 
 
 
+MODEL SUMMARY
+
+
+
 #### Choosing the best k
 Spielregler um zu sehen, dass je größer k desto kleiner die samples
 Is k Tuned Like Other Hyperparameters?
 
-    Unlike parameters like learning rate or number of layers, k is not optimized in the same way (e.g., grid search).
-    Instead, it's typically chosen heuristically based on dataset size and computational feasibility.
+Unlike parameters like learning rate or number of layers, k is not optimized in the same way (e.g., grid search).
+Instead, it's typically chosen heuristically based on dataset size and computational feasibility.
