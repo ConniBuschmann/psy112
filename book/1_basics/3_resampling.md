@@ -320,13 +320,13 @@ Please change k.
 <iframe src="https://trinket.io/embed/python3/29cdfb10f7f9" width="100%" height="356" frameborder="0" marginwidth="0" marginheight="0" allowfullscreen></iframe>
 
 
-```{admonition} The choice of k
+```{admonition} The big choice of k
 :class: note 
 
-The parameter k, which represents the number of folds in Cross-Validation (CV), is a hyperparameter. Choosing an appropriate k involves a trade-off between bias, variance, and computational cost
-A higher k generally provides a more stable and reliable estimate but comes with higher computational effort. However, a lower k may result in higher variance, meaning the performance estimation could be less stable.
+Choosing an appropriate k involves a trade-off between bias, variance, and computational cost.
+A higher k generally provides a more stable and reliable estimate but comes with higher computational effort, making it often impractical in real-world applications.
 
-Generally speaking, k = 5 or k = 10 is most common, as it balances computation time and reliability.
+Generally speaking, **k = 5 or k = 10** is most common, as it balances computation time and reliability.
 ```
 
 
@@ -362,4 +362,10 @@ scores = cross_val_score(clf, X, y, cv = loo)
 print("Average CV Score: ", scores.mean())
 ```
 
+
 ## **Bootstrapping**
+Bootstrapping is a resampling technique in statistics and machine learning that repeatedly draws samples **with replacement** from a dataset to estimate a population parameter. It can be used to quantify the uncertainty associated with a given estimator or statistical learning method. 
+
+As seen in Cross-Validation, Bootstrapping also uses training and validation sets. The training sets consist of samples drawn with replacement, while the original dataset serves as the validation set.
+
+Now let’s look at how to implement bootstrap sampling in python.
