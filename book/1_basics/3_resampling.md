@@ -79,7 +79,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
 # Create figure and axis
-fig, ax = plt.subplots(figsize=(8, 3))
+fig, ax = plt.subplots(figsize=(8, 3), dpi=200)
 ax.set_xlim(0, 10)
 ax.set_ylim(0, 6)
 ax.axis("off")
@@ -195,8 +195,8 @@ ax.text(6, 8.5, "Whole Data Set", ha='center', va='center', fontsize=12, color='
 
 # k=1 
 # Rectangle(xy, width, height...)
-ax.add_patch(patches.Rectangle((1, 2), 2, 1, color='lightcoral', alpha=0.6))        # Valdiation set
-ax.add_patch(patches.Rectangle((3, 2), 8, 1, color='lightblue', alpha=0.6))         # Training set 
+ax.add_patch(patches.Rectangle((1, 2), 2, 1, facecolor='lightcoral', alpha=0.6))        # Valdiation set
+ax.add_patch(patches.Rectangle((3, 2), 8, 1, facecolor='lightblue', alpha=0.6))         # Training set 
 
 # k=2 
 ax.add_patch(patches.Rectangle((1, 3), 2, 1, facecolor='lightblue',  alpha=0.6))  # First training part

@@ -6,4 +6,5 @@ seaborn
 nilearn
 scikit-learn
 jupyterquiz
+jupytercards
 
