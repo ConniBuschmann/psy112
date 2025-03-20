@@ -340,6 +340,7 @@ LOOCV is a special case of K-Fold Cross-Validation, where k equals the number of
 While LOOCV provides a low-bias estimate, it is computationally expensive and may lead to high variance in model performance. 
 
 In Python, the Leave One Out approach is very similiar to the k-fold procedure. Only the Cross validation method is changed to `LeaveOneOut()`. 
+
 ```{code-cell}
 # import packages
 from sklearn import datasets
