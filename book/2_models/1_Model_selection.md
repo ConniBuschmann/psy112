@@ -105,8 +105,14 @@ from jupyterquiz import display_quiz
 display_quiz("Quiz/Quiz_BestSubsetSelection.json", shuffle_answers=False)
 ```
 
-We will use the abess library, which stands for Adaptive BEst Subset Selection. It implements a powerful and efficient algorithmic framework to find the optimal feature subset extremely fast. It is open-source and publicly available on GitHub: https://github.com/abess-team/abess
+
+**To MICHA:** We could also think about using abess. https://github.com/abess-team/abess
+But for now I decided to not use it since it just do everything and I thought it might be harder to understand the concept behind it, because we  . However if you decide to go that way, we can use the following code chunk.
+We could also consider using abess (https://github.com/abess-team/abess) — it's a nice OPEN SOURCE library that performs best subset selection super efficiently.
+However, I decided not to use it for now because it does everything automatically, and I thought that might make it harder for students to understand what's actually happening. but if you prefer to go use abess, here is the code chunk, we could use:
 If you need more details:https://abess.readthedocs.io/en/latest/auto_gallery/1-glm/plot_1_LinearRegression.html#sphx-glr-auto-gallery-1-glm-plot-1-linearregression-py
+
+
 
 ```{code-cell} 
 from abess.linear import LinearRegression 
@@ -128,9 +134,9 @@ print("coef:\n", model.coef_)
 ```
 The abess algorithm evaluates all possible combinations of our 9 predictors and automatically selects the best subset based on internal criteria (e.g., minimizing BIC). In our case, it selected just two predictors: `CAtBat` and `Assists` 
 
-´abess´ already includes every step — so you don't need to perform cross-validation separately for example. 
+You can also implement Best Subset Selection manually using the `mlxtend` library. Unlike abess, this approach allows you to explicitly control and understand what’s happening at each step of the selection process.
 
-If you want more control over the process (e.g., custom evaluation metrics, manual cross-validation), you can also implement Best Subset Selection manually using `mlxtend`.
+In the following example, we evaluate all possible feature combinations from 1 to 9 predictors and identify the best subset based on cross-validated R² performance.
 
 ```{code-cell} 
 from sklearn.linear_model import LinearRegression
@@ -142,10 +148,10 @@ from mlxtend.feature_selection import ExhaustiveFeatureSelector as EFS
 X = hitters_subset.drop(columns=["Salary"])
 y = hitters_subset["Salary"]
 
-# Define the regression model (learner)
+# Define the regression model 
 model = LinearRegression()
 
-# Define 5-fold cross-validation
+# Use 5-fold cross-validation to evaluate model performance
 cv_folds = 5
 
 # Perform best subset selection 
@@ -158,17 +164,18 @@ efs = EFS(model,
 
 efs.fit(X, y)
 
-# Print best feature subset
+# Output the best feature subset and the corresponding cross-validated R^2 score
 print("Best Features:", efs.best_feature_names_)
 print("Best R² (CV):", efs.best_score_)
 ```
-After Step 2, you can plot the R² values of all models (e.g., M₁, M₂, ...) to visualize how performance varies across different model sizes.
+At this point, we've completed Step 2 of our model selection process: For each model size (1 to 9 predictors), we identified the best-performing combination.
+Now, we can take a closer look at all the models that were evaluated, not just the best one.
 
 
 ```{code-cell}
 import pandas as pd
 
-# All results as dictionary
+# Access the CV results for every model evaluated
 results = efs.get_metric_dict()
 
 # Convert to DataFrame
@@ -185,7 +192,7 @@ summary_df = summary_df.sort_values(by='r2_mean', ascending=False)
 
 summary_df.head()  # Show top models
 ```
-
+This table gives us an overview of the best feature combinations, sorted by their cross-validated R². It helps us see which models performed well and how much difference the feature choice made. To better understand the trade-off between model complexity and predictive power, we can visualize the best model performance at each model size.
 
 ```{code-cell}
 import matplotlib.pyplot as plt
@@ -215,11 +222,7 @@ plt.ylabel("Cross-validated R²")
 plt.show()
 
 ```
-
-Here, ´mlxtend´ manually evaluates all combinations of predictors (from 1 to 9 features) using k-fold cross-validation and selects the subset with the highest average R². This gives you fine-grained control over the evaluation and selection process.
-
-
-
+This plot helps us visualize how performance improves as we increase the number of features. It reflects Step 2 of our selection process and gives us insight into the bias-variance tradeoff: at some point, adding more features doesn't necessarily improve the model much.
 
 
 #### Forward Stepwise Selection
