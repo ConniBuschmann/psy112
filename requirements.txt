@@ -9,4 +9,4 @@ jupyterquiz
 jupytercards
 statsmodels
 abess
-mlxtemd
+mlxtend
