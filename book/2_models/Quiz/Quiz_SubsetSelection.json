@@ -3,19 +3,19 @@
     "type": "multiple_choice",
     "answers": [ 
         {
-            "answer": "For Best Subset Selection you have to test $2^p$ models.",
+            "answer": "For best subset selection you have to test 2^p models.",
             "correct": true
         },
         {
-            "answer": "Backward Stepwise Selection is preferred over Forward Stepwise Selection when p>n.",
+            "answer": "Backward stepwise selection is preferred over dorward stepwise selection when p>n.",
             "correct": false
         },
         {
-            "answer": "A model with all potential predictors will always have the smallest RSS/largest $R^2$, since the quantities are related to the training error.",
+            "answer": "A model with all potential predictors will always have the largest R\u00b2 since the quantities are related to the training error.",
             "correct": true
         },
         {
-            "answer": "Backward Stepwise Selection starts with a Full Model",
+            "answer": "Backward stepwise selection starts with a full model",
             "correct": true
         }
     ]

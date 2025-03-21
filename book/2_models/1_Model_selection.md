@@ -26,6 +26,7 @@ In neurocognitive psychology, brain imaging (e.g., fMRI, EEG), cognitive assessm
 
 This is where **linear model selection** becomes essential, offering techniques to refine our models and extract meaningful insights from high-dimensional neurocognitive data!
 
+----------------------------------------------------------------
 ### *Todays data with many predictors - Hitters dataset*
 For pracitcal demonstration, we will use the `Hitters` dataset. This data set provides Major League Baseball Data from the 1986 and 1987 seasons. It contains 322 observations of major league players on 20 variables. The Research aim is to predict a baseball player's salary on the basis of various predictors associated with the performance in the previous year.
 
@@ -42,10 +43,22 @@ Also take a closer look to the variable you want to predict! Do we have the info
 
 <iframe src="https://trinket.io/embed/python3/d980217b790c" width="100%" height="356" frameborder="0" marginwidth="0" marginheight="0" allowfullscreen></iframe>
 
+For computationally reasons, we will not include all predictors but only a small subset
+```{code-cell} 
+# keeping a total of 10 variables - the outcome Salary and 9 predictors.
+# Keeping only Salary and 9 predictors
+hitters_subset = hitters[["Salary", "CHits", "CAtBat", "CRuns", "CWalks", "Assists", "Hits", "HmRun", "Years", "Errors"]].copy()
+
+# make sure the rows, containing missing values, are dropped
+hitters_subset.dropna(inplace=True)
+
+hitters_subset.head()
+```
+
 
 Okay, now that we know our dataset, let's look at how to handle such a large number of predictors! 
 
-
+----------------------------------------------------------------
 ## Handling big data in linear models
 To handle large datasets efficiently in linear modeling, three key techniques are used:
 - Subset Selection
@@ -61,90 +74,191 @@ In subset selection we identify a subset of *p* predictos that are truly related
 
 How do we determine which variables are relevant?! 
 
-####  *Best Subset Selestion*
+####  Best Subset Selection
+
+```{image} ./figures/BestSubsetSelection.drawio.png
+:alt: ModelSelection
+:width: 20%
+:align: left
+```
 
 ```{margin}
 The Null Model only predicts the sample mean
 ```
 
-<div style="display: flex; align-items: center;">
-  <!-- Picture left -->
-  <div style="flex: 0 0 auto; margin-right: 20px; text-align: center;">
-    <figure>
-      <img src="BestSubsetSelection.drawio.png" alt="ModelSelection" width="200">
-      <figcaption>Best Subset Selection</figcaption>
-    </figure>
-  </div>
-
-  <!-- Text on the right -->
-  <div style="flex: 1;">
-    <ol>
-      <li>Consider all possible models
-        <ul>
-          <li>Starting with Null Model <em>M0</em>, which contains no predictors</li>
-          <li>Iteratively adding a predictor to the model</li>
-        </ul>
-      </li>
-      <li>Identify the Best Model of each size
-        <ul>
-          <li>Either by the smallest RSS or the largest <code>R²</code></li>
-        </ul>
-      </li>
-      <li>Identify the Best Overall Model
-        <ul>
-          <li>Use cross-validation to find the best <em>Mk</em></li>
-        </ul>
-      </li>
-    </ol>
-  </div>
-</div>
+1. Consider all possible models
+    - Starting with Null Model <em>M0</em>, which contains no predictors
+    Iteratively adding a predictor to the model
+2. Identify the Best Model of each size
+    - Either by the smallest RSS or the largest <code>R²</code></li>
+3. Identify the Best Overall Model
+    - Use cross-validation to find the best <em>Mk</em></li>
 
 
 
 
-#### *Forward Stepwise Selection*
+Let's get back to our dataset and see how Best Subset Seletion is performed in python.
+
+```{code-cell} ipython3
+:tags: ["remove-input"]
+from jupyterquiz import display_quiz
+display_quiz("Quiz/Quiz_BestSubsetSelection.json", shuffle_answers=False)
+```
+
+We will use the abess library, which stands for Adaptive BEst Subset Selection. It implements a powerful and efficient algorithmic framework to find the optimal feature subset extremely fast. It is open-source and publicly available on GitHub: https://github.com/abess-team/abess
+If you need more details:https://abess.readthedocs.io/en/latest/auto_gallery/1-glm/plot_1_LinearRegression.html#sphx-glr-auto-gallery-1-glm-plot-1-linearregression-py
+
+```{code-cell} 
+from abess.linear import LinearRegression 
+import numpy as np
+import pandas as pd
+
+# Prepare data
+X= np.array(hitters_subset.drop("Salary", axis=1))
+y= np.array(hitters_subset["Salary"])
+
+# Use abess for best subset selection
+model = LinearRegression(support_size=range(1, 10))  # support_size is how many features to try
+model.fit(X, y)
+
+# Get selected features (non-zero coefficients)
+ind = np.nonzero(model.coef_)
+print("non-zero:\n", hitters_subset.columns[ind])
+print("coef:\n", model.coef_)
+```
+The abess algorithm evaluates all possible combinations of our 9 predictors and automatically selects the best subset based on internal criteria (e.g., minimizing BIC). In our case, it selected just two predictors: `CAtBat` and `Assists` 
+
+´abess´ already includes every step — so you don't need to perform cross-validation separately for example. 
+
+If you want more control over the process (e.g., custom evaluation metrics, manual cross-validation), you can also implement Best Subset Selection manually using `mlxtend`.
+
+```{code-cell} 
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import cross_val_score
+from mlxtend.feature_selection import ExhaustiveFeatureSelector as EFS
+
+
+# Define predictors (X) and response variable (y)
+X = hitters_subset.drop(columns=["Salary"])
+y = hitters_subset["Salary"]
+
+# Define the regression model (learner)
+model = LinearRegression()
+
+# Define 5-fold cross-validation
+cv_folds = 5
+
+# Perform best subset selection 
+efs = EFS(model, 
+          min_features=1, 
+          max_features=9,       # Try all subsets from 1 to 9 features
+          scoring='r2',         # Use R² as performance metric
+          cv=cv_folds,          # Apply k-fold cross-validation (e.g., 5-fold)
+          print_progress=False)
+
+efs.fit(X, y)
+
+# Print best feature subset
+print("Best Features:", efs.best_feature_names_)
+print("Best R² (CV):", efs.best_score_)
+```
+After Step 2, you can plot the R² values of all models (e.g., M₁, M₂, ...) to visualize how performance varies across different model sizes.
+
+
+```{code-cell}
+import pandas as pd
+
+# All results as dictionary
+results = efs.get_metric_dict()
+
+# Convert to DataFrame
+summary_df = pd.DataFrame([
+    {
+        'features': res['feature_names'],
+        'r2_mean': res['avg_score']
+    }
+    for res in results.values()
+])
+
+# Sort by best R²
+summary_df = summary_df.sort_values(by='r2_mean', ascending=False)
+
+summary_df.head()  # Show top models
+```
+
+
+```{code-cell}
+import matplotlib.pyplot as plt
+import pandas as pd
+
+# Extract metric results
+metric_dict = efs.get_metric_dict()
+results = []
+
+for subset in metric_dict.values():
+    n_features = len(subset['feature_idx'])
+    avg_score = subset['avg_score']
+    results.append((n_features, avg_score))
+
+# Create DataFrame
+results_df = pd.DataFrame(results, columns=["n_features", "avg_r2"])
+
+# Aggregate by number of features (in case multiple subsets have the same size)
+results_df = results_df.groupby("n_features", as_index=False).max()
+
+# Plot
+plt.figure(figsize=(8, 5))
+plt.plot(results_df["n_features"], results_df["avg_r2"], marker="o")
+plt.title("Best Subset Selection: R² vs. Number of Features")
+plt.xlabel("Number of Features")
+plt.ylabel("Cross-validated R²")
+plt.show()
+
+```
+
+Here, ´mlxtend´ manually evaluates all combinations of predictors (from 1 to 9 features) using k-fold cross-validation and selects the subset with the highest average R². This gives you fine-grained control over the evaluation and selection process.
+
+
+
+
+
+#### Forward Stepwise Selection
+
+```{image} ./figures/ForwardStepwiseSelection.drawio.png
+:alt: ModelSelection
+:width: 20%
+:align: left
+```
 
 Best subset selection is not feasible for very large *p* due to its computational demands. A more efficient way solving this problem, is foward stepwise selection. 
 
-<div style="display: flex; align-items: center;">
-  <!-- Picture left -->
-  <div style="flex: 0 0 auto; margin-right: 20px; text-align: center;">
-    <figure>
-      <img src="ForwardStepwiseSelection.drawio.png" alt="ModelSelection" width="200">
-      <figcaption>Best Subset Selection</figcaption>
-    </figure>
-  </div>
-
-  <!-- Text on the right -->
-  <div style="flex: 1;">
-    <ol>
-      <li>Beginning with Null Model <em>M0</em>
-      <li>Adding the most significant variables one after the other
-        <ul>
-          <li>Either by the smallest RSS or the largest <code>R²</code></li>
-        </ul>
-      </li>
-      <li>Repeat it until...
-        <ul>
-          <li>k=p
-          <li>reaching a stopping criteria
-        </ul>
-       <li>Identifying the single best model using cross-validation
-      </li>
-    </ol>
-  </div>
-</div>
+1. Beginning with null hypothesis
+2. Adding the most significant variables one after the other
+    - Either by the smallest RSS or the largest <code>R²</code></li>
+3. Repeat it until...
+    - reaching a stopping criteria
+    - k=p
+4. Identifying the single best model using cross-validation
 
 
-#### *Backward Stepwise Selection*
+
+#### Backward Stepwise Selection
+```{image} ./figures/BackwardStepwiseSelection.drawio.png
+:alt: ModelSelection
+:width: 10%
+:align: left 
+```
+
 ```{margin}
 The Full Model contain all p predictors!
 ```
-1. Beginning with the Full Model *Mp* 
-2. Iteratibely removes the least usefull predictor
-3. Repeat until *k=0*
-4. Identify the best overall model using cross-validation
 
+1. Beginning with the Full Model <em>Mp</em>
+2. Iteratibely removes the least usefull predictor
+3. Repeat it until...
+    - reaching a stopping criteria
+    - <em>k=0</em>
+4. Identify the best overall model using cross-validation
 
 
 
