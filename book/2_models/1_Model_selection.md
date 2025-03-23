@@ -41,7 +41,7 @@ Get yourself familiar with the dataset. Look at the predictor variables. Which i
 You can check the variable names here: https://islp.readthedocs.io/en/latest/datasets/Hitters.html  
 Also take a closer look to the variable you want to predict! Do we have the information(s) that we need for all players?
 
-<iframe src="https://trinket.io/embed/python3/d980217b790c" width="100%" height="356" frameborder="0" marginwidth="0" marginheight="0" allowfullscreen></iframe>
+<iframe src="https://trinket.io/embed/python3/12222a549d51" width="100%" height="356" frameborder="0" marginwidth="0" marginheight="0" allowfullscreen></iframe>
 
 For computationally reasons, we will not include all predictors but only a small subset
 ```{code-cell} 
@@ -303,7 +303,9 @@ selected_features = list(sfs.k_feature_names_)
 print("Selected features:", selected_features)
 ```
 Just like we did with best subset selection, we now visualize the R² score at each model size. This helps us understand how the model performance improves as we add more predictors.
+
 ```{code-cell}
+:tags: [remove-input]
 # Plot the metrics for each number of features 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -328,6 +330,7 @@ plt.show()
 
 ```
 
+<iframe src="https://trinket.io/embed/python3/a00b2117cbe7" width="100%" height="356" frameborder="0" marginwidth="0" marginheight="0" allowfullscreen></iframe>
 <br>
 --------------------------------------------------------------
 
