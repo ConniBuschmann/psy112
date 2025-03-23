@@ -1,0 +1,7 @@
+[
+    {
+      "front": "Could you think about how to change the code to perform backward Selection instead of forward stepwise selection?",
+      "back": "You can simply change one parameter:\n\n```python\nSequentialFeatureSelector(\n    estimator=model,\n    n_features_to_select=k,\n    direction='backward',  # ← instead of 'forward'\n    scoring='r2',\n    cv=5\n)\n```"
+    }
+  ]
+  

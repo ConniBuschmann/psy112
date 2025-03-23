@@ -145,7 +145,7 @@ In the following example, we evaluate all possible feature combinations from 1 t
 ```{code-cell} 
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import cross_val_score
-from mlxtend.feature_selection import ExhaustiveFeatureSelector as EFS
+from mlxtend.feature_selection import ExhaustiveFeatureSelector
 
 
 # Define predictors (X) and response variable (y)
@@ -159,7 +159,7 @@ model = LinearRegression()
 cv_folds = 5
 
 # Perform best subset selection 
-efs = EFS(model, 
+efs = ExhaustiveFeatureSelector(model, 
           min_features=1, 
           max_features=9,       # Try all subsets from 1 to 9 features
           scoring='r2',         # Use R² as performance metric
@@ -251,6 +251,100 @@ Best subset selection is not feasible for very large *p* due to its computationa
 <br>
 <br>
 
+**TO MICHA**: Also here we have the oppurtunity to just use a forwardSelection function: https://github.com/talhahascelik/python_stepwiseSelection/blob/master/stepwiseSelection.py#L19 or to do it step by step by our own:
+
+Or use from mlxtend.feature_selection import SequentialFeatureSelector:
+
+So let`s apply forward stepwise selection. Just as before, we will use cross-validated R² to assess model performance.
+
+```{code-cell}
+import pandas as pd
+import numpy as np
+from mlxtend.feature_selection import SequentialFeatureSelector
+from sklearn.model_selection  import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import r2_score
+
+# Define predictors (X) and response variable (y)
+X = hitters_subset.drop(columns=["Salary"])
+y = hitters_subset["Salary"]
+
+# Define the regression model 
+model= LinearRegression()
+
+# define k for k-fold cross validation
+cv_folds = 5
+```
+After defining the predictors, response variable, and the number of cross-validation folds, we can now run the forward stepwise selection. Unlike exhaustive selection, which fits all possible models, forward selection starts with no predictors and adds one feature at a time — always choosing the one that improves performance the most. This process continues until we reach the maximum number of features (in this case, 9).If you'd rather stop after a specific number of features, you can control that using the `k_features` parameter.
+
+
+```{code-cell}
+from mlxtend.feature_selection import SequentialFeatureSelector
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import r2_score
+
+# Run forward selection using R² as the scoring metric
+forward = SequentialFeatureSelector(
+    model,              # defined model 
+    k_features=(1,9),   # Stopping criteria: Try models with 1,2,..,9 features
+    forward=True,       # use forward selection 
+    floating=False,     # Do not use floating selection -> Classic forward selection
+                        # floating =True : after each addition, it also checks if it should remove a feature that has become less useful
+    scoring='r2',       # Use R² score as the metric to evaluate model performance
+    cv=cv_folds)
+
+# Fit the prepared model on our data
+sfs = forward.fit(X, y)
+```
+Next we extract the final selected subset of features, which the algorithm determined to be the most predictive of Salary under forward selection.
+```{code-cell}
+# Get selected features
+selected_features = list(sfs.k_feature_names_)
+print("Selected features:", selected_features)
+```
+Just like we did with best subset selection, we now visualize the R² score at each model size. This helps us understand how the model performance improves as we add more predictors.
+```{code-cell}
+# Plot the metrics for each number of features 
+import matplotlib.pyplot as plt
+import pandas as pd
+ import pandas as pd
+
+# Access R² for each step (get stroed while forward stepwise selection process)
+r2_scores = []
+num_features = []
+
+for k in sfs.get_metric_dict().keys():
+    r2 = sfs.get_metric_dict()[k]['avg_score']
+    r2_scores.append(r2)
+    num_features.append(len(sfs.get_metric_dict()[k]['feature_idx']))
+
+# Plot
+plt.figure(figsize=(8, 5))
+plt.plot(num_features, r2_scores, marker='o')
+plt.title("Forward Selection: R² vs. Number of Features")
+plt.xlabel("Number of Features")
+plt.ylabel("Cross-validated R²")
+plt.show()
+
+```
+
+<br>
+--------------------------------------------------------------
+
+
+**Interim Summary**
+- As we can see, we ended up with the same three predictors as in best subset selection - `CRuns`, `Hits`, `Errors`. Once again, a combination of these three seems to perform best in predicting `Salary`. 
+- However, this is not necessarily always the case — best subset and stepwise selection can, and often do, **result in different predictors** or even a different number of predictors being selected.
+- Still, neither model explains much more than a third of the variance in salary — which suggests that **many other factors** not included in our dataset may be influencing player salaries (e.g., team dynamics, contracts, injuries, reputation, etc.).
+    - In this case, both models demonstrate limited predictive power, and while R² values of 0.3–0.4 can be acceptable in some real-world contexts, they should be **interpreted with caution**.
+
+
+
+--------------------------------------------------------------
+
+To wrap up our subset selection methods, let’s briefly explore backward stepwise selection.
+
+
 #### Backward Stepwise Selection
 ```{image} ./figures/BackwardStepwiseSelection.drawio.png
 :alt: ModelSelection
@@ -276,6 +370,16 @@ The Full Model contain all p predictors!
 <br>
 <br>
 
+Backward stepwise selection works very similarly to forward selection — the main difference is that we start with the full model and remove features one by one. 
+
+
+```{code-cell} ipython3
+:tags: [remove-input]
+
+from jupytercards import display_flashcards
+display_flashcards('Quiz/BackwardSelection_Flashcard.json')
+```
+
 
 ```{admonition} Subset Selection Summary
 :class: tip
@@ -287,9 +391,7 @@ The Full Model contain all p predictors!
 |**+** able to find the best model    |**+** computationally less demanding               |**+** computationally less demanding                 |
 
 
-
 ```
-
 
 
 ```{code-cell} ipython3
