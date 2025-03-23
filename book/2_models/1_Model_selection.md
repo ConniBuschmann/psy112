@@ -78,24 +78,27 @@ How do we determine which variables are relevant?!
 
 ```{image} ./figures/BestSubsetSelection.drawio.png
 :alt: ModelSelection
-:width: 20%
+:width: 30%
 :align: left
 ```
 
 ```{margin}
 The Null Model only predicts the sample mean
 ```
+<br>
+<br>
 
 1. Consider all possible models
     - Starting with Null Model <em>M0</em>, which contains no predictors
-    Iteratively adding a predictor to the model
+    - Iteratively adding a predictor to the model
 2. Identify the Best Model of each size
     - Either by the smallest RSS or the largest <code>R²</code></li>
 3. Identify the Best Overall Model
     - Use cross-validation to find the best <em>Mk</em></li>
 
-
-
+<br>
+<br>
+<br>
 
 Let's get back to our dataset and see how Best Subset Seletion is performed in python.
 
@@ -105,6 +108,7 @@ from jupyterquiz import display_quiz
 display_quiz("Quiz/Quiz_BestSubsetSelection.json", shuffle_answers=False)
 ```
 
+<br>
 
 **To MICHA:** We could also think about using abess. https://github.com/abess-team/abess
 But for now I decided to not use it since it just do everything and I thought it might be harder to understand the concept behind it, because we  . However if you decide to go that way, we can use the following code chunk.
@@ -226,14 +230,15 @@ This plot helps us visualize how performance improves as we increase the number 
 
 
 #### Forward Stepwise Selection
+Best subset selection is not feasible for very large *p* due to its computational demands. A more efficient way solving this problem, is foward stepwise selection. 
 
 ```{image} ./figures/ForwardStepwiseSelection.drawio.png
 :alt: ModelSelection
-:width: 20%
+:width: 30%
 :align: left
 ```
-
-Best subset selection is not feasible for very large *p* due to its computational demands. A more efficient way solving this problem, is foward stepwise selection. 
+<br>
+<br>
 
 1. Beginning with null hypothesis
 2. Adding the most significant variables one after the other
@@ -243,18 +248,22 @@ Best subset selection is not feasible for very large *p* due to its computationa
     - k=p
 4. Identifying the single best model using cross-validation
 
-
+<br>
+<br>
 
 #### Backward Stepwise Selection
 ```{image} ./figures/BackwardStepwiseSelection.drawio.png
 :alt: ModelSelection
-:width: 10%
+:width: 30%
 :align: left 
 ```
 
 ```{margin}
 The Full Model contain all p predictors!
 ```
+
+<br>
+<br>
 
 1. Beginning with the Full Model <em>Mp</em>
 2. Iteratibely removes the least usefull predictor
@@ -264,17 +273,12 @@ The Full Model contain all p predictors!
 4. Identify the best overall model using cross-validation
 
 
+<br>
+<br>
 
-```{code-cell} ipython3
-:tags: [remove-input]
-from jupyterquiz import display_quiz
-display_quiz('Quiz/Quiz_SubsetSelection.json')
-```
 
 ```{admonition} Subset Selection Summary
 :class: tip
-
-
 
 | Best Subset Selection            	  | Forward Stepwise Selection                        | Backward Stepwise Selection                         |
 |-------------------------------------|---------------------------------------------------|-----------------------------------------------------|
@@ -284,4 +288,12 @@ display_quiz('Quiz/Quiz_SubsetSelection.json')
 
 
 
+```
+
+
+
+```{code-cell} ipython3
+:tags: [remove-input]
+from jupyterquiz import display_quiz
+display_quiz('Quiz/Quiz_SubsetSelection.json')
 ```
