@@ -62,7 +62,7 @@ Let's also take a look at the correlation between predictors to check for potent
 
 ```{code-cell} 
 # Correlation heatmap for hitters_subset
-plt.figure(figsize=(5, 8))
+plt.figure(figsize=(8, 5))
 sns.heatmap(hitters_subset.corr(), annot=True, cmap="coolwarm", fmt=".2f")
 plt.title("Correlation Heatmap of Hitters Subset", fontsize=16)
 plt.show()
@@ -127,9 +127,9 @@ from sklearn.linear_model import Ridge
 
 #initialize list to store coefficient values
 coef=[]
-lamda = range(0,40)
+alphas = range(0,40)
 
-for a in lamda:
+for a in alphas:
   ridgereg=Ridge(alpha=a)
   ridgereg.fit(X_train_scaled,y_train)
   coef.append(ridgereg.coef_)
