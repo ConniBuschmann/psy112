@@ -7,7 +7,7 @@
             "correct": true
         },
         {
-            "answer": "Backward stepwise selection is preferred over dorward stepwise selection when p>n.",
+            "answer": "Backward stepwise selection is preferred over forward stepwise selection when p>n.",
             "correct": false
         },
         {
