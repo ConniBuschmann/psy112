@@ -162,18 +162,19 @@ import pandas as pd
 
 # Fit Ridge regression through cross validation
 ridge_cv = RidgeCV(alphas=lambda_range, store_cv_values=True)
-print(f"The optimal alpha value for our analysis ends up being {ridge_cv.alpha_}.")
+ridge_cv.fit(X_train_scaled, y_train) 
 
-# fit ridge regression using the trainings data
-ridge_cv.fit(X_train_scaled, y_train)
+print(f"The optimal alpha value for our analysis ends up being {ridge_cv.alpha_}.")
 
 # Create a DataFrame to display predictor names and their corresponding coefficients
 coef_table = pd.DataFrame({
     'Predictor': X_train.columns,
     'Ridge Coefficient': ridge_cv.coef_
 })
-# sorting table
-coef_table.sort_values(by='Ridge Coefficient', key=abs, ascending=False)
+
+# Sort table by absolute value of Ridge Coefficient
+coef_table = coef_table.reindex(coef_table['Ridge Coefficient'].abs().sort_values(ascending=False).index)
 
 print(coef_table)
+
 ```
