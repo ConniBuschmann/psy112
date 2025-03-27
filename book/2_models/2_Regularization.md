@@ -127,7 +127,7 @@ from sklearn.linear_model import Ridge
 
 #initialize list to store coefficient values
 coef=[]
-alphas = range(0,40)
+alphas = range(1,40)
 
 for a in alphas:
   ridgereg=Ridge(alpha=a)
@@ -146,7 +146,7 @@ ax.axis('tight')
 
 ```{code-cell}
 # set range 
-lambda_range= range(0,40)
+lambda_range= range(1,40)
 ```
 
 **Step 3:** 
