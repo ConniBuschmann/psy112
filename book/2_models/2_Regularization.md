@@ -30,62 +30,76 @@ Building on subset selection, an alternative approach is to include all *p* pred
 For pracitcal demonstration, we will use again the `Hitters` dataset. 
 
 ```{code-cell} 
-# import packages
 import statsmodels.api as sm 
-import matplotlib.pyplot as plt
-import seaborn as sns
 
 # get dataset
 hitters = sm.datasets.get_rdataset("Hitters", "ISLR").data
 
-# keeping a total of 10 variables - the outcome Salary and 9 predictors.
-# Keeping only Salary and 9 predictors
-hitters_subset = hitters[["Salary", "CHits", "CAtBat", "CRuns", "CWalks", "Assists", "Hits", "HmRun", "Years", "Errors"]].copy()
+# keeping a total of 15 variables - the target ´Salary´ and 14 features.
+hitters_subset = hitters[["Salary", "AtBat", "Runs","RBI", "CHits", "CAtBat", "CRuns", "CWalks", "Assists", "Hits", "HmRun", "Years", "Errors", "Walks"]].copy()
 
 # make sure the rows, containing missing values, are dropped
 hitters_subset.dropna(inplace=True)
 
 hitters_subset.head()
 ```
-```{code-cell} 
-from sklearn.model_selection import train_test_split
-
-# Defining target and features
-X = hitters_subset.drop(columns=["Salary"])
-y = hitters_subset["Salary"]
-
-# split into training and test data set
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-```
 Let's also take a look at the correlation between predictors to check for potential multicollinearity, which can affect the stability of linear regression models.
 
 ```{code-cell} 
-# Correlation heatmap for hitters_subset
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Correlation heatmap for hitters subset
 plt.figure(figsize=(8, 5))
 sns.heatmap(hitters_subset.corr(), annot=True, cmap="coolwarm", fmt=".2f")
 plt.title("Correlation Heatmap of Hitters Subset", fontsize=16)
 plt.show()
 ```
-The heatmap reveals strong correlations between several predictors, indicating multicollinearity — making ridge regression an appropriate modeling choice. While subset selection can reduce overfitting, it may still be unstable in the presence of multicollinearity, as it tends to arbitrarily select among highly correlated predictors.
+The heatmap reveals strong correlations between several predictors, indicating multicollinearity — making Ridge regression an appropriate modeling choice. However, we need to be cautious when correlations are too high, as this suggests that some features are nearly duplicates.
+- `CHits` and `CAtBat` show a correlation of *1*,
+- `CHits` and `CRuns`have a very strong correlation of *0.98*,
+- `Hits` and `AtBat` are also highly correlated, with *0.96* 
 
+In such cases, it may be beneficial to remove one of the correlated features to avoid redundancy and improve model interpretability.
 
-## TO MICHA: SHOULD WE INCLUDE THIS? Makind subset selection unbrauchbar for this dataset
+**Hands on:**
+Again take a look at what the feautures are measuring (https://islp.readthedocs.io/en/latest/datasets/Hitters.html) and decide, which one to drop! To make your decision not just random, maybe think about the relevance in predicting the `Salary`. Drop the features and check the heatmap again!
 
+<iframe src="https://trinket.io/embed/python3/31e21c627234" width="100%" height="356" frameborder="0" marginwidth="0" marginheight="0" allowfullscreen></iframe>
 
-## Ridge Regression
-To understand ridge regression, lets have a look at the formula. As you will see ridge regression is very similiar to ordinary least squares fitting, but includes an tuning parameter that needs to be determined seperately.
+```{code-cell} ipython3
+:tags: [remove-input]
+## Removing features
+# List of features to drop
+features_drop = ["AtBat", "CRuns", "CAtBat"]
+# dropping 
+hitters_subset2= hitters_subset.drop(columns= features_drop)
+```
 
+Then we can continue prepare our data by defining target and features and split it into training and test set. 
+
+```{code-cell} 
+from sklearn.model_selection import train_test_split
+
+# Defining target and features
+X = hitters_subset2.drop(columns=["Salary"])
+y = hitters_subset2["Salary"]
+
+# split into training and test data set
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+```
+
+### Ridge Regression
 ```{margin}
 Lamda is a tuning parameter that controls the strength of the penalty! 
 ```
 
 $$
- \sum_{i=1}^{n} (y_i - \hat{y}_i)^2 + \lambda \sum_{j=1}^{p} \beta_j^2
+\sum_{i=1}^{n}\left( y_i - \beta_0 - \sum_{j=1}^{p} \beta_j x_{ij} \right)^2 + \lambda \sum_{j=1}^{p} \beta_j^2
 $$
 
 Where: 
-- $ \sum_{i=1}^{n} (y_i - \hat{y}_i)^2 $ is the **residual sum of squares (RSS)**  
+- $ \sum_{i=1}^{n}\left( y_i - \beta_0 - \sum_{j=1}^{p} \beta_j x_{ij} \right)^2  $ is the **residual sum of squares (RSS)**  
 
 - $ \lambda \sum_{j=1}^{p} \beta_j^2 $ is the **L2 penalty** on the coefficients 
 
@@ -102,7 +116,7 @@ Where:
  Thus, selecting a good value of lambda is crucial. For this, we can use cross-validation.
 ```
 **Step 1:** 
-Before we implement ridge regression, we need to standardize the variables since ridge regression is senstivite to scaling. This can be done by using `StandardScaler`from `sklearn`package. 
+Before we implement ridge regression, we need to standardize the variables since ridge regression is senstivite to scaling. This can be done by using `StandardScaler`from `scikit-learn`package. 
 
 ```{code-cell} 
 # scale the data to have mean 0 and stdev 1
@@ -124,10 +138,11 @@ Next, we set up a range of values for λ. The graph nicely visualize how the bet
 :tags: [remove-input]
 
 from sklearn.linear_model import Ridge
+import numpy as np 
 
 #initialize list to store coefficient values
 coef=[]
-alphas = range(1,40)
+alphas = np.linspace(0.001, 15, 80) 
 
 for a in alphas:
   ridgereg=Ridge(alpha=a)
@@ -145,8 +160,10 @@ ax.axis('tight')
 ```
 
 ```{code-cell}
+import numpy as np 
+
 # set range 
-lambda_range= range(1,40)
+lambda_range= np.linspace(0.001, 15, 80) 
 ```
 
 **Step 3:** 
@@ -160,21 +177,76 @@ In 'scikit-learn' the lamda parameter is called alpha! Don't get confused by tha
 from sklearn.linear_model import RidgeCV
 import pandas as pd
 
-# Fit Ridge regression through cross validation
-ridge_cv = RidgeCV(alphas=lambda_range, store_cv_values=True)
+# getting the best alpha through cross validation
+ridge_cv = RidgeCV(alphas=lambda_range)
+# fit ridge regression on given data using best alpha
 ridge_cv.fit(X_train_scaled, y_train) 
 
 print(f"The optimal alpha value for our analysis ends up being {ridge_cv.alpha_}.")
 
-# Create a DataFrame to display predictor names and their corresponding coefficients
+# getting R² traing score 
+train_score_ridge= ridge_cv.score(X_train_scaled, y_train)
+
+print(f"The R² train score for ridge model is {format(train_score_ridge)}.")
+```
+For identifying the model coefficients, we can print a table listing those. 
+```{code-cell} 
+# create a DataFrame to display predictor names and their corresponding coefficients
 coef_table = pd.DataFrame({
     'Predictor': X_train.columns,
     'Ridge Coefficient': ridge_cv.coef_
 })
 
-# Sort table by absolute value of Ridge Coefficient
+# sort table by absolute value of Ridge Coefficient
 coef_table = coef_table.reindex(coef_table['Ridge Coefficient'].abs().sort_values(ascending=False).index)
 
 print(coef_table)
+```
+
+**Step 4:** 
+Finally, we evaluate the model's performance on unseen data to assess its generalization ability.
+
+```{code-cell} 
+# fitting it and getting R² test score 
+test_score_ridge= ridge_cv.score(X_test_scaled, y_test)
+
+print(f"The R² test score for ridge model is {format(test_score_ridge)}.")
+```
+
+### Lasso Regression
+Lasso takes the same idea as Ridge Regression and aims to shrinkage coefficients toward zero. In contrast to Ridge Regression Lasso does not include all predcitors in the final model by forcing some predictors to be exactly zero. 
+
+$$
+\sum_{i=1}^{n} \left( y_i - \beta_0 - \sum_{j=1}^{p} \beta_j x_{ij} \right)^2 + \lambda \sum_{j=1}^{p} |\beta_j|\
+$$
+
+Where: 
+- $ \sum_{i=1}^{n}\left( y_i - \beta_0 - \sum_{j=1}^{p} \beta_j x_{ij} \right)^2  $ is the **residual sum of squares (RSS)**  
+
+- $ \lambda \sum_{j=1}^{p} |\beta_j|\ $ is the **L1 penalty** on the coefficients 
+
+
+<br>
+Just as the basic concept, also the implementation of Lasso regression in python is quite similir. As a first step we need to **standardize** the features and as the second step we set up a **range** for our tuning parameter λ. In  third step we identify the **best λ** by applying `LassoCV` from the `scikit-learn` package. Lastly, we can use the test data set to evalute the test performance. 
+
+<br>
+
+**Hands on**: Please use the code chunk below and apply a Lasso Regression on our Hitters subset! Please try to answer the following questions:
+- What is the best lamda this time?
+- How does the model perform with unseen data?
+- Looking at the coefficients, how many predictor were forced to become 0?
+
+<iframe src="https://trinket.io/embed/python3/7f210b6e2f87" width="100%" height="356" frameborder="0" marginwidth="0" marginheight="0" allowfullscreen></iframe>
+
+
+```{code-cell} ipython3
+:tags: [remove-input]
+
+# Dataset: hitters_subset2 - already splitted into X and y and splitted into training and test- dataset.
+
 
 ```
+
+
+When is Lasso better than Ridge?
+plot both also with linear 
