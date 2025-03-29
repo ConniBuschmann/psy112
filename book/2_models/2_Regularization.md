@@ -142,7 +142,7 @@ import numpy as np
 
 #initialize list to store coefficient values
 coef=[]
-alphas = np.linspace(0.001, 15, 80) 
+alphas = np.linspace(0.001, 20, 80) 
 
 for a in alphas:
   ridgereg=Ridge(alpha=a)
@@ -163,7 +163,7 @@ ax.axis('tight')
 import numpy as np 
 
 # set range 
-lambda_range= np.linspace(0.001, 15, 80) 
+lambda_range= np.linspace(0.001, 20, 80) 
 ```
 
 **Step 3:** 
@@ -234,19 +234,106 @@ Just as the basic concept, also the implementation of Lasso regression in python
 **Hands on**: Please use the code chunk below and apply a Lasso Regression on our Hitters subset! Please try to answer the following questions:
 - What is the best lamda this time?
 - How does the model perform with unseen data?
-- Looking at the coefficients, how many predictor were forced to become 0?
+- Looking at the coefficients, how many predictor were forced to become 0? According to this model, what are the key features? 
 
 <iframe src="https://trinket.io/embed/python3/7f210b6e2f87" width="100%" height="356" frameborder="0" marginwidth="0" marginheight="0" allowfullscreen></iframe>
 
 
 ```{code-cell} ipython3
-:tags: [remove-input]
+#:tags: [remove-input]
 
 # Dataset: hitters_subset2 - already splitted into X and y and splitted into training and test- dataset.
+import numpy as np 
+import pandas as pd
+from sklearn.linear_model import LassoCV
+from sklearn.preprocessing import StandardScaler
 
+# STEP 1: Standarize 
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+# Use the same scaler to transform test data
+X_test_scaled = scaler.transform(X_test)
 
+# STEP 2: Range for lamda
+lambda_range= np.linspace(0.001, 20, 80) 
+
+# STEP 3: Identifying best lamda and fit 
+# getting the best alpha through cross validation
+lasso_cv = LassoCV(alphas=lambda_range)
+# fit ridge regression on given data using best alpha
+lasso_cv.fit(X_train_scaled, y_train) 
+
+print(f"The optimal alpha value for our analysis ends up being {lasso_cv.alpha_}. The best option for Ridge regression was {ridge_cv.alpha_}")
+
+# getting R² traing score 
+train_score_lasso=lasso_cv.score(X_train_scaled, y_train)
+
+print(f"The R² train score for lasso model is {format(train_score_lasso)}.")
+
+# LOOKING AT COEFFICIENTS
+# create a DataFrame to display predictor names and their corresponding coefficients
+coef_table = pd.DataFrame({
+    'Predictor': X_train.columns,
+    'Lasso_Coefficient': lasso_cv.coef_
+})
+
+# sort table by absolute value of Ridge Coefficient
+coef_table = coef_table.reindex(coef_table['Lasso_Coefficient'].abs().sort_values(ascending=False).index)
+
+print(coef_table)
+
+# STEP 4: Evaluationg
+# fitting it and getting R² test score 
+test_score_lasso= lasso_cv.score(X_test_scaled, y_test)
+
+print(f"The R² test score for lasso model is {format(test_score_lasso)}.")
 ```
 
+### Lasso or Ridge Regression?! 
+In General , neither Righe nor Lasso will universally dominate the other! However, there are 3 main differences: 
+1) Regularization Type
+- Lasso regression applies L1 regularization, penalizing the absolute values of the coefficients
+- Ridge regression applies L2 regularization, penalizing the squared values of the coefficients
+2) Coefficient Selection 
+-  Lasso tends to shrink some coefficients all the way to zero, effectively performing feature selection by excluding less relevant variables
+- Ridge also shrinks coefficients toward zero, but does not eliminate any completely. Instead of selecting variables, it distributes the effect across all features
 
-When is Lasso better than Ridge?
-plot both also with linear 
+```{image} ./figures/Budget_LassoRidge.png 
+:alt: Budget Lasso vs Ridge Regression
+:width: 80%
+:align: center 
+```
+<br>
+
+3) Response to multiple connilearity:
+- Lasso tends to select one variable from a group of highly correlated predictors and set the others to zero 
+-  Ridge, on the other hand, shares the influence across correlated predictors by shrinking their coefficients without removing any
+
+```{code-cell}  ipython3
+:tags: [remove-input]
+
+import matplotlib.pyplot as pl
+features = hitters_subset2.drop(columns=["Salary"])
+# getting feaute names
+features = features.columns.tolist()
+
+plt.figure(figsize = (8, 5))
+
+#add plot for ridge regression
+plt.plot(features ,ridge_cv.coef_,alpha=0.8,linestyle='none',marker='*',markersize=5,color='red',label=r'Ridge',zorder=7)
+
+#add plot for lasso regression
+plt.plot(lasso_cv.coef_,alpha=0.8,linestyle='none',marker='d',markersize=6,color='blue',label=r'Lasso')
+
+# Horizontal dashed line at y = 0
+plt.axhline(y=0, color='gray', linestyle='--', linewidth=0.7)
+
+#rotate axis
+plt.xticks(rotation=45)
+plt.xlabel("Features")
+plt.ylabel("Coefficient Value")
+plt.ylim(bottom=-40)
+plt.legend()
+plt.title("Ridge vs. Lasso Coefficients")
+plt.show()
+```
