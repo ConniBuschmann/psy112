@@ -311,7 +311,12 @@ In General , neither Righe nor Lasso will universally dominate the other! Howeve
 
 ```{code-cell}  ipython3
 :tags: [remove-input]
+from sklearn.linear_model import LinearRegression
+# having linear regression as comparison
+lr = LinearRegression()
+lr.fit(X_train_scaled, y_train)
 
+# PLOTTING
 import matplotlib.pyplot as pl
 features = hitters_subset2.drop(columns=["Salary"])
 # getting feaute names
@@ -320,10 +325,13 @@ features = features.columns.tolist()
 plt.figure(figsize = (8, 5))
 
 #add plot for ridge regression
-plt.plot(features ,ridge_cv.coef_,alpha=0.8,linestyle='none',marker='*',markersize=5,color='red',label=r'Ridge',zorder=7)
+plt.plot(features ,ridge_cv.coef_,alpha=0.8,linestyle='none',marker='d',markersize=5,color='green',label=r'Ridge Regression',zorder=7)
 
 #add plot for lasso regression
-plt.plot(lasso_cv.coef_,alpha=0.8,linestyle='none',marker='d',markersize=6,color='blue',label=r'Lasso')
+plt.plot(lasso_cv.coef_,alpha=0.8,linestyle='none',marker='d',markersize=6,color='#8A2BE2',label=r'Lasso Regression')
+
+#add plot for linear model
+plt.plot(features,lr.coef_,alpha=0.4,linestyle='none',marker='o',markersize=7,color='lightpink',label='Linear Regression')
 
 # Horizontal dashed line at y = 0
 plt.axhline(y=0, color='gray', linestyle='--', linewidth=0.7)
@@ -332,7 +340,7 @@ plt.axhline(y=0, color='gray', linestyle='--', linewidth=0.7)
 plt.xticks(rotation=45)
 plt.xlabel("Features")
 plt.ylabel("Coefficient Value")
-plt.ylim(bottom=-20)
+plt.ylim(bottom=-27)
 plt.legend()
 plt.title("Ridge vs. Lasso Coefficients")
 plt.show()
