@@ -34,8 +34,8 @@ Overfitting: occurs when a function is too closely aligned to the training data 
 One key issue is handling irreducible error and keeping training as well as test MSE in check. A model that is too closely fitted to the training data may resemble a tailor-made suit—perfectly customized for one person but unlikely to fit anyone else. Similarly, a model with a very low **training MSE** might appear to perform well, but its inability to generalize to new, unseen data often results in a high **test MSE**.
 
 ```{margin}
-Variance: orange
-Bias: green
+Variance: orange,
+Bias: green,
 Test MSE: red
 ```
 
