@@ -292,11 +292,11 @@ print(f"The R² test score for lasso model is {format(test_score_lasso)}.")
 ### Lasso or Ridge Regression?! 
 In General , neither Righe nor Lasso will universally dominate the other! However, there are 3 main differences: 
 1) Regularization Type
-- Lasso regression applies L1 regularization, penalizing the absolute values of the coefficients
-- Ridge regression applies L2 regularization, penalizing the squared values of the coefficients
+    - Lasso regression applies L1 regularization, penalizing the absolute values of the coefficients
+    - Ridge regression applies L2 regularization, penalizing the squared values of the coefficients
 2) Coefficient Selection 
--  Lasso tends to shrink some coefficients all the way to zero, effectively performing feature selection by excluding less relevant variables
-- Ridge also shrinks coefficients toward zero, but does not eliminate any completely. Instead of selecting variables, it distributes the effect across all features
+    -  Lasso tends to shrink some coefficients all the way to zero, effectively performing feature selection by excluding less relevant variables
+    - Ridge also shrinks coefficients toward zero, but does not eliminate any completely. Instead of selecting variables, it distributes the effect across all features
 
 ```{image} ./figures/Budget_LassoRidge.png 
 :alt: Budget Lasso vs Ridge Regression
@@ -306,8 +306,8 @@ In General , neither Righe nor Lasso will universally dominate the other! Howeve
 <br>
 
 3) Response to multiple connilearity:
-- Lasso tends to select one variable from a group of highly correlated predictors and set the others to zero 
--  Ridge, on the other hand, shares the influence across correlated predictors by shrinking their coefficients without removing any
+   - Lasso tends to select one variable from a group of highly correlated predictors and set the others to zero 
+    -  Ridge, on the other hand, shares the influence across correlated predictors by shrinking their coefficients without removing any
 
 ```{code-cell}  ipython3
 :tags: [remove-input]
